@@ -10,6 +10,18 @@ Den här guiden förklarar hur du publicerar fraktPDF, både källkoden och fär
 
 ---
 
+## Vem kan publicera releaser? (viktigt)
+
+**Bara du (och eventuella medarbetare du lägger till) kan publicera releaser.** Detta är GitHub:s standardbeteende — du behöver inte göra något extra för att låsa det:
+
+- Alla som inte är medarbetare kan **använda** programmet: klona källkoden och ladda ner/automatuppdatera via [Releases](https://github.com/seplateshelp/fraktPDF/releases).
+- Ingen utanför repot kan **pusha**, skapa taggar eller publicera/ändra releaser. Det kräver skrivrättigheter, som bara ägaren (eller konton du lägger till under **Settings → Collaborators / Manage access**) har.
+- **Auto-uppdateringen fungerar för alla** utan någon inloggning: appen hämtar `latest.yml` och installeraren från GitHubs publika nedladdningslänk.
+
+Med andra ord: den som släpper versionen är alltid den som kontrollerar repot. För att en annan person ska kunna släppa en version måste du aktivt lägga till dem som medarbetare med skrivrättigheter.
+
+---
+
 ## 1. Publicera källkoden
 
 Första gången du trycker upp hela källkoden till ett nytt/annat repo:

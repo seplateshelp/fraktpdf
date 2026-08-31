@@ -103,6 +103,8 @@ Att skapa presets och hotkeys är enklare än någonsin. Vid sidopanelen vid "F�
 
 Allt du behöver veta finns i [PUBLISHING.md](PUBLISHING.md) — hur du publicerar källkoden, skapar en release och ser till att användarna får uppdateringen.
 
+> **Vem kan släppa versioner?** Endast underhållarna (ägaren av repot, eller de du lägger till som medarbetare) kan publicera releaser. Alla andra kan använda programmet och hämta nya versioner via auto-uppdateringen — men bara projektets ägare kan släppa en ny version. Detta är GitHub:s standardbeteende och kräver ingen extra konfiguration.
+
 ## Ansvarsfriskrivning
 
 Vi ansvarar inte för användningen av programmet. Allt förvaras lokalt på din dator och inget delas med oss.
