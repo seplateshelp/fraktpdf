@@ -4,6 +4,12 @@
   <img src="https://i.ibb.co/rGTq6VYQ/Nytt-projekt-2026-08-31-T214801-090.png" alt="fraktPDF banner" width="800">
 </p>
 
+<p align="center">
+  <a href="https://github.com/seplateshelp/fraktpdf/releases/latest">
+    <img src="https://i.ibb.co/bj3wTJV2/Nytt-projekt-2026-08-31-T225008-821.png" alt="Ladda ner senaste versionen" width="800">
+  </a>
+</p>
+
 <h3 align="center">Enklare sätt att skriva ut</h3>
 
 <p align="center">
@@ -58,16 +64,7 @@ Befintliga alternativ är ofta tunga, otympliga och saknar stöd för anpassade 
 fraktPDF stödjer endast **Windows 10/11**.
 
 ### Ladda ner färdig installerare
-Ladda ner senaste versionen från [Releases](https://github.com/seplateshelp/fraktPDF/releases). Installeraren är tyst och snabb — inga guider som stör. När en ny version släpps uppdateras programmet automatiskt (eller efter att du godkänt det, beroende på inställningarna).
-
-### Bygg från källkod
-```bash
-git clone https://github.com/seplateshelp/fraktPDF.git
-cd fraktPDF
-npm install
-npm start        # starta i utvecklingsläge
-npm run dist     # bygg Windows-installerare (utan att publicera)
-```
+Ladda ner senaste versionen från [Releases](https://github.com/seplateshelp/fraktPDF/releases). Installeraren är tyst och snabb — inga guider som stör. När en ny version släpps uppdateras programmet automatiskt (eller efter att du godkänt det, beroende på inställningarna). Du kan även bygga den själv från källkoden — se [Bygg och installera själv](#bygg-och-installera-själv).
 
 ## Användning
 
@@ -99,11 +96,18 @@ Att skapa presets och hotkeys är enklare än någonsin. Vid sidopanelen vid "F�
 - **Språk**: Svenska / English
 - **Utskrift**: standard-skrivare (utan dialogruta), DPI och standard pappersformat
 
-## Publicera en ny version
+## Bygg och installera själv
 
-Allt du behöver veta finns i [PUBLISHING.md](PUBLISHING.md) — hur du publicerar källkoden, skapar en release och ser till att användarna får uppdateringen.
+Vill du bygga installeraren från källkoden själv (istället för att ladda ner den färdiga) gör du så här:
 
-> **Vem kan släppa versioner?** Endast underhållarna (ägaren av repot, eller de du lägger till som medarbetare) kan publicera releaser. Alla andra kan använda programmet och hämta nya versioner via auto-uppdateringen — men bara projektets ägare kan släppa en ny version. Detta är GitHub:s standardbeteende och kräver ingen extra konfiguration.
+```bash
+git clone https://github.com/seplateshelp/fraktPDF.git
+cd fraktPDF
+npm install
+npm run dist    # bygger Windows-installeraren till mappen release-installer/
+```
+
+Installeraren lägger du sedan i `release-installer/` med namnet `fraktPDF-Setup-<version>.exe`. Du kan också köra programmet direkt från källkoden med `npm start` för att testa utan att bygga något.
 
 ## Ansvarsfriskrivning
 
