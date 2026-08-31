@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/seplateshelp/fraktpdf/releases/latest">
-    <img src="https://i.ibb.co/bj3wTJV2/Nytt-projekt-2026-08-31-T225008-821.png" alt="Ladda ner senaste versionen" width="800">
+    <img src="https://i.ibb.co/bj3wTJV2/Nytt-projekt-2026-08-31-T225008-821.png" alt="Ladda ner senaste versionen" width="400">
   </a>
 </p>
 
