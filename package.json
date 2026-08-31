@@ -1,0 +1,62 @@
+{
+  "name": "fraktpdf",
+  "version": "1.0.0",
+  "description": "Snabb beskärning och utskrift av fraktsedlar",
+  "author": "SEPLATES",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never",
+    "release": "electron-builder --win --publish always"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "electron-updater": "^6.8.9",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "4.10.38"
+  },
+  "devDependencies": {
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "se.fraktklipp.app",
+    "productName": "fraktPDF",
+    "directories": {
+      "output": "release-installer"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "icon": "src/assets/fraktpdflogo.ico",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "seplateshelp",
+        "repo": "fraktPDF"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "src/assets/fraktpdflogo.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
+    },
+    "fileAssociations": [
+      {
+        "ext": "pdf",
+        "name": "fraktPDF PDF",
+        "description": "PDF-fil för fraktsedel",
+        "role": "Viewer"
+      }
+    ]
+  }
+}

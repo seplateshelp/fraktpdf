@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="sv" data-theme="dark" data-accent="blue">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fraktPDF</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand">
+      <span class="brand-logo"><img src="assets/SEPLATESfraktpdf.svg" alt="" /></span>
+      <span class="brand-text">
+        <span class="brand-name">fraktPDF</span>
+        <span class="brand-sub" data-i18n="brandBy">av SEPLATES</span>
+      </span>
+    </div>
+    <div class="header-actions">
+      <button class="quiet" id="createButton" data-i18n="createPdf">+ Skapa PDF</button>
+      <button class="quiet" id="openButton" data-i18n="openPdf">Öppna PDF</button>
+      <button class="quiet icon-btn" id="queueButton" title="Skriv ut kö (Q)" aria-label="Skriv ut kö">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <span class="queue-count" id="queueBadge">0</span>
+      </button>
+      <button class="primary" id="printButton" disabled data-i18n="print">Skriv ut</button>
+      <span class="sep"></span>
+      <div class="win-controls no-drag">
+        <button class="win-btn" id="winMin" aria-label="Minimera" title="Minimera (F11)">
+          <svg viewBox="0 0 10 10"><path d="M0 5H10" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <button class="win-btn" id="winMax" aria-label="Maximera" title="Maximera (F11)">
+          <svg viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <button class="win-btn win-close" id="winClose" aria-label="Stäng" title="Stäng">
+          <svg viewBox="0 0 10 10"><path d="M1 1 L9 9 M9 1 L1 9" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <aside>
+      <section class="intro">
+        <p id="fileName" class="doc-title" data-i18n="noDoc">Öppna en PDF för att börja.</p>
+      </section>
+      <section class="panel">
+        <div class="panel-heading"><h2 data-i18n="presets">Förinställningar</h2><button class="text-button" id="savePreset" disabled data-i18n="saveCurrent">Spara aktuell</button></div>
+        <div id="presetList" class="preset-list"><p class="muted">Inga sparade förinställningar.</p></div>
+      </section>
+      <section class="panel queue-panel">
+        <div class="panel-heading"><h2 data-i18n="printQueue">Utskriftskö</h2><span class="queue-count-plain"><b id="queueCount">0</b></span></div>
+        <div id="queueList" class="queue-list"><p class="muted">Inga etiketter i kön.</p></div>
+        <div class="queue-footer">
+          <button id="queueAddButton" class="quiet full" disabled data-i18n="addQueue">Lägg till i kö (Q)</button>
+          <button id="queuePrintButton" class="primary full" disabled data-i18n="printAll">Skriv ut alla (0)</button>
+        </div>
+      </section>
+      <div class="sidebar-footer">
+        <button id="exportButton" class="quiet full" disabled data-i18n="saveCropped">Spara beskuren PDF</button>
+        <div class="settings-row">
+          <button id="langToggle" class="lang-toggle" title="Språk / Language">Svenska</button>
+          <button id="settingsButton" class="settings-btn" data-i18n="settings" title="Inställningar">⚙ Inställningar</button>
+          <span class="version-text" id="versionText" title="fraktPDF">v1.0.0</span>
+        </div>
+      </div>
+    </aside>
+    <section class="workspace">
+      <div id="viewer" class="viewer">
+        <div id="tabs" class="tabs hidden">
+          <div id="tabList" class="tab-list"></div>
+          <button id="newTabButton" class="new-tab" data-i18n-title="openPdf">+</button>
+          <button id="closeAllButton" class="close-all" data-i18n="closeAll">Stäng alla</button>
+        </div>
+        <div id="emptyState" class="empty-state">
+          <div class="empty-mark">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <h2 data-i18n="dropHere">Släpp en fraktsedel här</h2>
+          <p data-i18n="orChoose">eller välj en PDF från datorn</p>
+          <button class="primary" id="emptyOpen" data-i18n="choosePdf">Välj PDF</button>
+        </div>
+        <div id="editor" class="editor hidden">
+          <div class="page-stage" id="stage">
+            <div class="page-wrap" id="pageWrap">
+              <canvas id="pdfCanvas"></canvas>
+              <div id="cropBox" class="crop-box"><span class="handle nw"></span><span class="handle ne"></span><span class="handle se"></span><span class="handle sw"></span></div>
+            </div>
+          </div>
+          <div class="float-islands">
+            <div class="island island-status"><span class="confirmed" id="confirmedBadge"></span><span class="status-text" id="statusText"></span></div>
+            <div class="island zoom-island">
+              <button id="zoomOut" title="Zooma ut">−</button>
+              <span id="zoomPct" class="zoom-pct">100%</span>
+              <button id="zoomIn" title="Zooma in">+</button>
+              <button id="zoomReset" class="tool-btn" title="Återställ zoom">1:1</button>
+            </div>
+            <div class="island island-actions">
+              <button id="queueAddButtonTop" class="quiet" title="Lägg i utskriftskö (Q)" disabled data-i18n="addQueueShort">+ Kö</button>
+              <button id="closeCurrentButton" class="quiet" title="Stäng PDF" data-i18n="closePdf">Stäng PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="createView" class="create-view hidden">
+        <div class="create-toolbar">
+          <div class="grp">
+            <button id="addTextBtn" class="tool-btn" title="Lägg till text (T)" aria-label="Lägg till text">T</button>
+            <button id="addImageBtn" class="tool-btn" title="Lägg till bild" aria-label="Lägg till bild">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </button>
+            <button id="deleteTextBtn" class="tool-btn" title="Ta bort vald (Delete)" disabled aria-label="Ta bort">✕</button>
+            <button id="duplicateBtn" class="tool-btn" title="Duplicera (Ctrl+D)" disabled aria-label="Duplicera">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+          </div>
+          <div class="grp">
+            <select id="cFont" title="Teckensnitt"></select>
+          </div>
+          <div class="grp">
+            <input id="cSize" type="number" min="6" max="300" value="20" title="Teckenstorlek" />
+            <button id="cBold" class="tool-btn" title="Fet" aria-label="Fet">B</button>
+            <button id="cItalic" class="tool-btn" title="Kursiv" aria-label="Kursiv">I</button>
+            <select id="cAlign" title="Justering"><option value="left">Vänster</option><option value="center">Centrerad</option><option value="right">Höger</option></select>
+          </div>
+          <div class="grp">
+            <input id="cColor" type="color" value="#000000" title="Textfärg" />
+          </div>
+          <div class="grp align-grp">
+            <label class="align-label" title="Justering på sidan" aria-label="Justering på sidan">
+              <button id="alLeft" class="tool-btn a-btn" title="Vänsterjustera på sidan">←</button>
+              <button id="alCenter" class="tool-btn a-btn" title="Centrera horisontellt">↔</button>
+              <button id="alRight" class="tool-btn a-btn" title="Högerjustera på sidan">→</button>
+              <button id="alTop" class="tool-btn a-btn" title="Toppjustera">↑</button>
+              <button id="alMiddle" class="tool-btn a-btn" title="Centrera vertikalt">⇕</button>
+              <button id="alBottom" class="tool-btn a-btn" title="Bottenjustera">↓</button>
+            </label>
+          </div>
+          <div class="grp img-grp hidden" id="img-grp">
+            <button id="cImageGray" class="tool-btn" title="Gråskala (utskriftsförhandsvisning)" aria-label="Gråskala">G</button>
+          </div>
+          <div class="grp" style="margin-left:auto">
+            <button id="cZoomOut" class="tool-btn" title="Zooma ut">−</button>
+            <span id="cZoomPct" class="zoom-pct">100%</span>
+            <button id="cZoomIn" class="tool-btn" title="Zooma in">+</button>
+            <select id="cSizeSel" title="Pappersformat"><option value="a4">A4</option><option value="a5">A5</option><option value="10x15">10×15 cm</option></select>
+            <button class="quiet" id="createBackBtn" data-i18n="back">Tillbaka</button>
+            <button class="primary" id="createExportBtn" data-i18n="savePdf">Spara PDF</button>
+          </div>
+        </div>
+        <div class="create-stage" id="createStage"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="presetDialog"><form method="dialog"><h2 data-i18n="savePresetTitle">Spara förinställning</h2><p data-i18n="savePresetDesc">Ge den ett namn och välj ett valfritt snabbkommando.</p><input id="presetName" placeholder="Till exempel: Tradera standard" autofocus maxlength="40" /><label class="hotkey-label" data-i18n="shortcut">Snabbkommando <select id="presetHotkey"><option value="">Inget</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></label><div class="dialog-actions"><button class="quiet" value="cancel" data-i18n="cancel">Avbryt</button><button class="primary" id="confirmPreset" value="default" data-i18n="save">Spara</button></div></form></dialog>
+
+  <dialog id="saveDialog"><form method="dialog"><h2 data-i18n="saveCroppedTitle">Spara beskuren PDF</h2><p data-i18n="saveCroppedDesc">Välj hur filen ska sparas.</p>
+    <div class="field"><label data-i18n="format">Format</label><div class="radio-row">
+      <label class="radio-chip selected" id="optCopy"><input type="radio" name="saveType" value="copy" checked /><span data-i18n="saveCopy">Spara en kopia</span></label>
+      <label class="radio-chip" id="optOverwrite"><input type="radio" name="saveType" value="overwrite" /><span data-i18n="overwrite">Skriv över original</span></label>
+    </div></div>
+    <div class="dialog-actions"><button class="quiet" value="cancel" data-i18n="cancel">Avbryt</button><button class="primary" id="confirmSave" value="default" data-i18n="save">Spara</button></div>
+  </form></dialog>
+
+  <dialog id="settingsDialog" class="settings-dialog"><form method="dialog">
+    <h2 id="settingsHeading">Inställningar</h2>
+    <p id="settingsIntro">Anpassa fraktPDF efter ditt arbetsflöde.</p>
+
+    <div class="settings-section">
+      <h3 data-i18n="secAppearance">Utseende</h3>
+      <div class="settings-field">
+        <label data-i18n="theme">Tema</label>
+        <div class="chip-row" id="themeChips">
+          <label class="chip theme-chip dark selected"><input type="radio" name="theme" value="dark" /><span class="theme-swatch"></span><span data-i18n="themeDark">Mörkt</span></label>
+          <label class="chip theme-chip light"><input type="radio" name="theme" value="light" /><span class="theme-swatch"></span><span data-i18n="themeLight">Ljust</span></label>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label data-i18n="accent">Accentfärg</label>
+        <div class="chip-row" id="accentChips">
+          <label class="chip accent-chip selected"><input type="radio" name="accent" value="blue" hidden /><span class="accent-swatch blue"></span><span class="accent-label" data-i18n="accentBlue">Blå</span></label>
+          <label class="chip accent-chip"><input type="radio" name="accent" value="green" hidden /><span class="accent-swatch green"></span><span class="accent-label" data-i18n="accentGreen">Grön</span></label>
+          <label class="chip accent-chip"><input type="radio" name="accent" value="yellow" hidden /><span class="accent-swatch yellow"></span><span class="accent-label" data-i18n="accentYellow">Gul</span></label>
+          <label class="chip accent-chip"><input type="radio" name="accent" value="purple" hidden /><span class="accent-swatch purple"></span><span class="accent-label" data-i18n="accentPurple">Lila</span></label>
+          <label class="chip accent-chip"><input type="radio" name="accent" value="red" hidden /><span class="accent-swatch red"></span><span class="accent-label" data-i18n="accentRed">Röd</span></label>
+          <label class="chip accent-chip"><input type="radio" name="accent" value="white" hidden /><span class="accent-swatch white"></span><span class="accent-label" data-i18n="accentWhite">Vit</span></label>
+          <label class="chip accent-chip"><input type="radio" name="accent" value="orange" hidden /><span class="accent-swatch orange"></span><span class="accent-label" data-i18n="accentOrange">Orange</span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3 data-i18n="secUpdates">Uppdateringar</h3>
+      <div class="settings-field">
+        <label data-i18n="updateMode">Så här uppdateras fraktPDF</label>
+        <div class="chip-row" id="updateChips">
+          <label class="chip selected"><input type="radio" name="updateMode" value="auto" /><span data-i18n="updateAuto">Uppdatera automatiskt</span></label>
+          <label class="chip"><input type="radio" name="updateMode" value="notify" /><span data-i18n="updateNotify">Fråga mig först</span></label>
+        </div>
+      </div>
+      <button class="text-button" id="checkUpdatesBtn" data-i18n="checkUpdates">Sök efter uppdateringar</button>
+    </div>
+
+    <div class="settings-section">
+      <h3 data-i18n="secLanguage">Språk</h3>
+      <div class="settings-field">
+        <label data-i18n="language">Språk</label>
+        <select id="settingsLang">
+          <option value="sv">Svenska</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3 data-i18n="secPrint">Utskrift</h3>
+      <div class="settings-field">
+        <label data-i18n="printer">Skrivare</label>
+        <select id="settingsPrinter"></select>
+        <p class="muted" id="printerHint" data-i18n="printerHint">Välj en skrivare för att skriva ut utan dialogruta.</p>
+      </div>
+      <div class="settings-field">
+        <label data-i18n="dpi">Upplösning (DPI)</label>
+        <select id="settingsDpi">
+          <option value="96">96 (skärm)</option>
+          <option value="150">150</option>
+          <option value="200">200</option>
+          <option value="300">300 (etiketter)</option>
+          <option value="600">600 (hög)</option>
+        </select>
+        <p class="muted" data-i18n="dpiHint">Standard för utskrift av etiketter.</p>
+      </div>
+      <div class="settings-field">
+        <label data-i18n="defaultPaper">Standard pappersformat (Skapa PDF)</label>
+        <select id="settingsPaper">
+          <option value="a4">A4</option>
+          <option value="a5">A5</option>
+          <option value="10x15">10×15 cm</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="quiet" value="cancel" data-i18n="close">Stäng</button>
+      <button class="primary" id="confirmSettings" value="default" data-i18n="save">Spara</button>
+    </div>
+  </form></dialog>
+
+  <dialog id="updateDialog" class="update-popup-dialog"><form method="dialog">
+    <h2>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      <span id="updateTitle" data-i18n="updateAvailable">Ny version tillgänglig</span>
+    </h2>
+    <p id="updateMessage">En ny version av fraktPDF finns.</p>
+    <div id="updateProgressWrap" class="hidden">
+      <div class="progress-track"><div class="progress-fill" id="updateProgressFill" style="width:0%"></div></div>
+      <div class="progress-pct" id="updateProgressPct">0%</div>
+    </div>
+    <div class="dialog-actions" id="updateActions">
+      <button class="quiet" value="later" data-i18n="later">Senare</button>
+      <button class="primary" id="updateNowBtn" value="default" data-i18n="updateNow">Uppdatera nu</button>
+    </div>
+  </form></dialog>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>
